@@ -1,0 +1,29 @@
+{
+    "autoload": {
+        "classmap": [
+            "lids/PHP/branches.php",
+            "lids/PHP/tier.php",
+            "lids/PHP/png.php"
+        ]
+    },
+    "name": "saasey/lids",
+    "description": "Highly efficient, easy to use Neural Network",
+    "version": "v2.5",
+    "keywords": [
+        "artificial intelligence",
+        "deep learning",
+        "machine learning",
+        "neural network",
+        "TensorFlow"
+    ],
+    "readme": "lids\\README.md",
+    "time": "2019-12-15",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Anthony David Pulse, Jr.",
+            "email": "inland14@live.com",
+            "role": "Architect/Devop/Creator/Designer"
+        }
+    ]
+}

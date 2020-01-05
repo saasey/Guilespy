@@ -1,0 +1,21 @@
+# Refer to:
+# https://help.github.com/articles/dealing-with-line-endings/
+
+# The default option for everything: Let Git figure out what it thinks is best.
+* text=auto
+
+# Make sure that Git understands that these files are NOT text files, and that
+# it therefore shouldn't be tampering with line endings there.
+*.bmp binary
+*.dib binary
+*.gif binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.webp binary
+
+# Refer to:
+# https://github.com/github/linguist
+
+# Tells GitHub that markdown files should be regarded as documentation.
+*.md linguist-documentation
