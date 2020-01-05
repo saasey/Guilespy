@@ -132,14 +132,8 @@ class Tier
             $svf = (file_get_contents(__DIR__ . "/../dataset/" . $file));
             
             similar_text($bri, $svf, $intersect);
-            $datapoints = 0;
-
-            if (strlen($bri) < strlen($svf))
-                $datapoints = strlen($bri)/strlen($svf);
-            if (strlen($bri) >= strlen($svf))
-                $datapoints = strlen($svf)/strlen($bri);
             
-            if ($intersect > 30) {
+            if ($intersect > 40) {
                 $input->crops = array($file, $intersect);
                 $this->label_search($input);
                 $RETURN = 0;

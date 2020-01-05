@@ -32,7 +32,7 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     $dataset->search_imgs($node);
 
     $x++;
-    if ($x == 45)
+    if ($x == 25)
         break;
 }
 
