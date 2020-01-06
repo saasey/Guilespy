@@ -127,14 +127,25 @@ class Tier
                 continue;
             }
             if (__DIR__ . "/../dataset/" . $file == $input->image_sha1) {
+
             }
 
             $svf = (file_get_contents(__DIR__ . "/../dataset/" . $file));
+            $i = 0;
+            $intersect = 0;
+            while ($i < strlen($bri) && $i < strlen($svf)) {
+                if ($bri[$i] == $svf[$i]){
+                    $intersect++;
+                }
+                else if ($intersect/$i < 0.0004) {
+                //    break;
+                }
+                $i++;
+            }
+            //similar_text($bri, $svf, $intersect);
             
-            similar_text($bri, $svf, $intersect);
-            
-            if ($intersect > 40) {
-                $input->crops = array($file, $intersect);
+            if ($intersect / $i > 0.070) {
+                $input->crops = array($file, $intersect / $i);
                 $this->label_search($input);
                 $RETURN = 0;
             }
@@ -154,9 +165,6 @@ class Tier
     {
         $temp = ($filename->crops);
         if ($temp[1] == 100) {
-            #echo "<img src='" . $filename->origin . "' style='height:70px;width:70px'/>";
-            #echo json_encode($filename->keywords) . " ";
-            #echo $temp[1] . "% Correct<br/>";
             return 1;
         }
 
