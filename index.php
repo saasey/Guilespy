@@ -6,7 +6,7 @@ require "vendor/autoload.php";
 
 // tier() is a class for the common list
 // that holds all the information
-
+$start_timer = time();
 // PNG() is for image manipulation
 $png = new PNG();
 
@@ -32,17 +32,15 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     $dataset->search_imgs($node);
 
     $x++;
-    if ($x == 25)
+    if ($x == 2005)
         break;
 }
 
 echo "<hr/>";
 $branch2 = new Branches();
-$branch2->origin = dirname(__FILE__) . "/lids/php" . "/../origin/baselineasc.png";
+$branch2->origin = dirname(__FILE__) . "/lids/php" . "/../origin/00002.JPG";
 
 $branch2->keywords = array("2", ":P pic");
-
-$dataset->add_branch_img($branch2);
 $dataset->relabel_img($branch2, array("test", "to", "death"));
 $dataset->label_search($branch2);
 
@@ -50,7 +48,7 @@ $object_var = new PNG();
 $branch3 = new Branches();
 $object_for_action = new Tier();
 
-$branch3->origin = dirname(__FILE__) . "/lids/php" . "/../origin/baselinedesc.png";
+$branch3->origin = dirname(__FILE__) . "/lids/php" . "/../origin/00024.JPG";
 $node = $object_var->find_tier($branch3);
 $dataset->relabel_img($node, array("therein", "we", "go"));
 
@@ -58,3 +56,5 @@ $dataset->label_search($node);
 // Let's get both of our labels here
 // save your latest dataset(common list)
 $dataset->save_dataset("save.txt");
+
+echo time() - $start_timer;

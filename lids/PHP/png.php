@@ -9,7 +9,7 @@ namespace lids\PHP;
  * Shrinks files to just above "ambiguous" state
  *
  * @author David Pulse <tcp@null.net>
- * @api 2.5
+ * @api 3
  */
 class PNG extends Tier
 {

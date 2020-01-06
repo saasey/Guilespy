@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Tier Class
  *
  * @author David Pulse <tcp@null.net>
- * @api 2.5
+ * @api 3
 
  */
 class Tier
@@ -148,6 +148,8 @@ class Tier
                 $input->crops = array($file, $intersect / $i);
                 $this->label_search($input);
                 $RETURN = 0;
+                flush();
+                \ob_flush();
             }
         }
         return $RETURN;
@@ -174,7 +176,7 @@ class Tier
             if ($this->head[$i]->origin == $filename->origin) {
                 continue;
             }
-            if (count($this->head) > $i && in_array($temp[0], array_unique($array_temp))) {
+            if (count($this->head) > $i && isset($temp[0]) && in_array($temp[0], array_unique($array_temp))) {
                 echo "<img tag='" . $this->head[$i]->crops[0] . "' src='" . $this->head[$i]->origin . "' style='height:70px;width:70px'/>";
                 echo json_encode($this->head[$i]->keywords) . " ";
                 echo $temp[1] . "% Correct<br/>";
