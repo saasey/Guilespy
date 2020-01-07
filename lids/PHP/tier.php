@@ -5,11 +5,11 @@ namespace lids\PHP;
 /**
  * Tier Class
  *
- * @author David Pulse <tcp@null.net>
- * @api 3
-
+ * @author David Pulse <inland14@live.com>
+ * @api 3.0.1
+ *
  */
-class Tier
+class Tier extends PNG
 {
 
     /**
@@ -18,9 +18,17 @@ class Tier
      * @var Branches
      */
     public $head;
+    
+    /**
+     * holds the Save file IO object
+     *
+     * @var Save
+     */
+    public $save;
 
     public function __construct()
     {
+        $this->save = new Save();
         $this->head = [];
     }
 
@@ -51,7 +59,7 @@ class Tier
     {
         if (!is_array($node->keywords)) {
             echo "Keywords must be an array. <br/>Please modify $node->origin's Keywords.";
-            return 0;
+            return $node;
         }
         $png = new PNG();
         $node = $png->find_tier($node);
@@ -61,72 +69,6 @@ class Tier
         }
 
         return $node;
-    }
-
-    /**
-     *   public function save_dataset
-     *   @param string $filename Output filename
-     *
-     *   Creates save file for common list
-     *
-     *  @return void
-     */
-    public function save_dataset(string $filename)
-    {
-        $temp = $this->head;
-        $this->head = array_unique($temp, SORT_REGULAR);
-        file_put_contents($filename, serialize($this->head));
-    }
-
-    /**
-     *   public function load_dataset
-     *   @param string $filename Recover dataset object from $filename
-     *
-     *   Load dataset from file
-     *
-     *  @return tier
-     */
-    public function load_dataset(string $filename, Tier &$t)
-    {
-        $file = file_get_contents($filename);
-        $t->head = unserialize($file);
-        if (!is_a($t, "Tier")) {
-            $t = new Tier();
-        }
-
-    }
-    
-    /**
-     *   public function search_imgs_sub_dir
-     *   @param Branches &$input   Search through files in sub-dir for prefabricated data
-     *
-     *   Searches for and finds thumbnail_img
-     *   name.
-     *
-     *   @return bool
-     */
-    public function search_imgs_sub_dir(Branches &$input, string $dir)
-    {
-        $RETURN = 0;
-        if (file_exists($input->thumb_dir . "/" . "$dir/" . $input->crops[0])) {
-            $input->thumb_dir .= "$dir/" . $input->crops[0];
-            
-            $dir2 = \explode('\\',$input->thumb_dir);
-            $dir2 = \explode('/',$dir2[count($dir2)-1]);
-            return $input;
-        }
-        foreach (scandir(__DIR__ . "/../dataset/" . $dir . "/") as $sub_file) {
-            if ($sub_file[0] == '.') {
-                continue;
-            }
-            if (is_dir($input->thumb_dir . "/" . $sub_file)) {
-                $RETURN = $this->search_imgs_sub_dir($input, $dir . "/" . $sub_file);
-                if (is_int($RETURN) && $RETURN == 0)
-                    continue;
-                return $RETURN;
-            }
-        }
-        return 0;
     }
 
     /**
@@ -145,7 +87,7 @@ class Tier
         $perc = [];
         $bri_array = [];
         $RETURN = 1;
-        
+
         $this->search_imgs_sub_dir($input, "");
 
         $bri = (file_get_contents($input->thumb_dir));
@@ -162,12 +104,12 @@ class Tier
             $svf_in->cat = "";
             if (is_dir(__DIR__ . "/../dataset/" . $file)) {
                 $this->search_imgs_sub_dir($svf_in, "");
-            }
-            else if (filesize(__DIR__ . "/../dataset/" . $file) == 0) {
+            } else if (filesize(__DIR__ . "/../dataset/" . $file) == 0) {
                 continue;
-            }
-            else
+            } else {
                 $svf = (file_get_contents($svf_in->thumb_dir . $file));
+            }
+
             $i = 0;
             $intersect = 0;
             while ($i < strlen($bri) && $i < strlen($svf)) {
@@ -186,7 +128,7 @@ class Tier
         }
         return $RETURN;
     }
-    
+
     /**
      *   public function label_search
      *   @param string $filename Finds label according to $filename
@@ -212,7 +154,7 @@ class Tier
                 echo "<img tag='" . $this->head[$i]->crops[0] . "' src='" . $this->head[$i]->origin . "' style='height:70px;width:70px'/>";
                 echo json_encode($this->head[$i]->keywords) . " ";
                 echo $this->head[$i]->cat . " ";
-                echo round($temp[1],4) . "% Correct<br/>";
+                echo round($temp[1], 4) . "% Correct<br/>";
                 return 1;
             }
         }
@@ -236,11 +178,5 @@ class Tier
                 return;
             }
         }
-    }
-
-    public function reset_all()
-    {
-        echo "Please empty " . dirname(__DIR__) . "/PHP/dataset and remove your save file to start over.";
-        return;
     }
 }

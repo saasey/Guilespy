@@ -8,8 +8,8 @@ namespace lids\PHP;
  * Moves, resizes, recolors, crops, and
  * Shrinks files to just above "ambiguous" state
  *
- * @author David Pulse <tcp@null.net>
- * @api 3
+ * @author David Pulse <inland14@live.com>
+ * @api 3.0.1
  */
 class PNG
 {
@@ -27,12 +27,12 @@ class PNG
     {
         $RETURN = 0;
         if (file_exists(__DIR__ . "/../dataset/$dir/" . $input->crops[0])) {
-            $input->thumb_dir .= "/$dir";
-            $input->crops[2] = $dir;
+            if (is_dir($input->thumb_dir . "/$dir"))
+                $input->thumb_dir .= "/$dir/" . $input->crops[0];
             $dir2 = \explode('\\',$input->thumb_dir);
             $dir2 = \explode('/',$dir2[count($dir2)-1]);
-            $input->cat = json_encode($dir2[4]);
-            return 1;
+            $input->cat = $dir2[4];
+            return $input;
         }
         foreach (scandir(__DIR__ . "/../dataset/$dir/") as $sub_file) {
             if ($sub_file[0] == '.') {
@@ -40,9 +40,9 @@ class PNG
             }
             if (is_dir(__DIR__ . "/../dataset/$dir/" . $sub_file)) {
                 $RETURN = $this->search_imgs_sub_dir($input, $dir . $sub_file);
-                if ($RETURN == 1)
-                    return 1;
-                continue;
+                if (is_int($RETURN))
+                    continue;
+                return $RETURN;
             }
 
         }
@@ -60,24 +60,22 @@ class PNG
     public function find_tier(Branches $src)
     {
         
-        $file_sha = hash_file('SHA1', $src->origin, false) . "yv";
+        $file_sha = hash_file('SHA1', $src->origin, false);
         if (!is_dir((__DIR__) . "/../dataset/$src->cat/") && $src->cat != "dataset")
             \mkdir((__DIR__) . "/../dataset/$src->cat/");
         $src->image_sha1 = (__DIR__) . "/../dataset/$src->cat/" . $file_sha;
         $src->crops = array($file_sha, 0);
 
-        if ($this->search_imgs_sub_dir($src, "$src->cat") == 1) {
-            //$src->image_sha1 = $src->thumb_dir . "/$src->cat/" . $file_sha;
+        if (!is_int($this->search_imgs_sub_dir($src, ""))) {
             return $src;
         }
         $scale = imagecreatefromstring(file_get_contents($src->origin));
-        //$scale = imagescale($scale, (int) (300));
+        
         \imagepng($scale,$src->image_sha1);
         
         #$img = imagecreatefrompng($src->image_sha1);
         $this->get_weighted_state($scale, $src->image_sha1);
 
-        #\imagepng($img,$src->image_sha1);
         return $src;
     }
 
@@ -105,9 +103,8 @@ class PNG
         for ($x = 0; $x < $width; $x++) {
             for ($y = 0; $y < $height; $y++) {
                 $rgb_l1 = imagecolorat($Handle, $x, $y);
-                $layer = [($rgb_l1 >> 16) & 0xFF, ($rgb_l1 >> 8)%256 & 0xFF, $rgb_l1%256 & 0xFF];
-                $max = max((int)$layer[0],(int)$layer[1],(int)$layer[2]);
-                $min = min((int)$layer[0],(int)$layer[1],(int)$layer[2]);
+                $max = max((int)($rgb_l1 >> 16) & 0xFF,(int)($rgb_l1 >> 8)%256 & 0xFF,(int)($rgb_l1%256) & 0xFF);
+                $min = min((int)($rgb_l1 >> 16) & 0xFF,(int)($rgb_l1 >> 8)%256 & 0xFF,(int)($rgb_l1%256) & 0xFF);
                 
                 imageline($img, (int)($x)%$sku_width, 0, (int)($x)%$sku_width, $max, $rgb_l1);
                 imageline($img, (int)($x+8), $sku_height - $min, (int)($x+8), $min, $x%512); // Bias! $x + (bias)

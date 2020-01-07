@@ -1,12 +1,12 @@
-<?php
+<?php declare (strict_types = 1);
 
 namespace lids\PHP;
 
 /**
  * Branches Class
  *
- * @author David Pulse <tcp@null.net>
- * @api 3
+ * @author David Pulse <inland14@live.com>
+ * @api 3.0.1
  * 
  */
 class Branches {

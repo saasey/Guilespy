@@ -12,7 +12,7 @@ $png = new PNG();
 
 $dataset = new Tier();
 // load your last saved common list
-//$dataset->load_dataset("save.txt", $dataset);
+$dataset->save->load_dataset($dataset, "save.txt");
 
 //instantiate new Branches() object
 // Fill in `origin` and `thumb_dir`
@@ -57,6 +57,6 @@ $dataset->relabel_img($node, array("therein", "we", "go"));
 $dataset->label_search($node);
 // Let's get both of our labels here
 // save your latest dataset(common list)
-$dataset->save_dataset("save.txt");
+$dataset->save->save_dataset($dataset, "save.txt");
 
 echo "Took " . (time() - $start_timer) . " seconds to complete";
