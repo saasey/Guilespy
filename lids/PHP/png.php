@@ -11,8 +11,40 @@ namespace lids\PHP;
  * @author David Pulse <tcp@null.net>
  * @api 3
  */
-class PNG extends Tier
+class PNG
 {
+
+    /**
+     *   public function search_imgs_sub_dir
+     *   @param Branches &$input   Search through files in sub-dir for prefabricated data
+     *
+     *   Searches for and finds thumbnail_img
+     *   name.
+     *
+     *   @return bool
+     */
+    public function search_imgs_sub_dir(Branches &$input, string $dir)
+    {
+        $RETURN = 0;
+        if (file_exists(__DIR__ . "/../dataset/$dir/" . $input->crops[0])) {
+            $input->thumb_dir .= "/$dir";
+            $input->crops[2] = $dir;
+            return 1;
+        }
+        foreach (scandir(__DIR__ . "/../dataset/$dir/") as $sub_file) {
+            if ($sub_file[0] == '.') {
+                continue;
+            }
+            if (is_dir(__DIR__ . "/../dataset/$dir/" . $sub_file)) {
+                $RETURN = $this->search_imgs_sub_dir($input, $dir . $sub_file);
+                if ($RETURN == 1)
+                    return 1;
+                continue;
+            }
+
+        }
+        return 0;
+    }
 
     /**
      *   public function find_tier
@@ -24,12 +56,14 @@ class PNG extends Tier
      */
     public function find_tier(Branches $src)
     {
-        $file_sha = hash_file('SHA1', $src->origin, false) . "y";
-        $src->image_sha1 = (__DIR__) . "/../dataset/" . $file_sha . "v";
+        
+        $file_sha = hash_file('SHA1', $src->origin, false) . "yv";
+        $src->image_sha1 = (__DIR__) . "/../dataset/" . $file_sha;
         $src->crops = array($file_sha, 0);
-        //touch((__DIR__) . "/../dataset/" . $file);
-        if (file_exists((__DIR__) . "/../dataset/" . $file_sha . "v"))
+        if ($this->search_imgs_sub_dir($src, "") == 1) {
+            $src->image_sha1 = $src->thumb_dir . "/" . $file_sha;
             return $src;
+        }
         $scale = imagecreatefromstring(file_get_contents($src->origin));
         //$scale = imagescale($scale, (int) (300));
         \imagepng($scale,$src->image_sha1);

@@ -32,7 +32,7 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     $dataset->search_imgs($node);
 
     $x++;
-    if ($x == 2005)
+    if ($x == 25)
         break;
 }
 
@@ -57,4 +57,4 @@ $dataset->label_search($node);
 // save your latest dataset(common list)
 $dataset->save_dataset("save.txt");
 
-echo time() - $start_timer;
+echo "Took " . time() - $start_timer . " seconds to complete";

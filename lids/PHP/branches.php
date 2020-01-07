@@ -30,7 +30,7 @@ class Branches {
      *
      * @var string
      */
-    protected $thumb_dir;
+    public $thumb_dir;
   
     /**
      * holds temporary image data
@@ -45,11 +45,19 @@ class Branches {
      * @var string
      */
     public $crops;
+
+    /**
+     * holds the image category name
+     *
+     * @var string
+     */
+    public $cat;
     
     public function __construct() {
-        $this->thumb_dir = dirname(__DIR__) . "/dataset/";
+        $this->thumb_dir = dirname(__DIR__) . "/PHP/../dataset";
         $this->crops = [];
         $this->image_sha1 = "";
+        $this->cat = "dataset";
     }
 
 }

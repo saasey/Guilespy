@@ -95,11 +95,45 @@ class Tier
         }
 
     }
+    
+    /**
+     *   public function search_imgs_sub_dir
+     *   @param Branches &$input   Search through files in sub-dir for prefabricated data
+     *
+     *   Searches for and finds thumbnail_img
+     *   name.
+     *
+     *   @return bool
+     */
+    public function search_imgs_sub_dir(Branches &$input, string $dir)
+    {
+        $RETURN = 0;
+        if (file_exists($input->thumb_dir . "/" . "$dir/" . $input->crops[0])) {
+            $input->thumb_dir .= "$dir/" . $input->crops[0];
+            $input->crops[2] = $dir;
+            
+            $dir2 = \explode('\\',$input->thumb_dir);
+            $dir2 = \explode('/',$dir2[count($dir2)-1]);
+            echo $dir . "..";
+            return 1;
+        }
+        foreach (scandir(__DIR__ . "/../dataset/" . $dir . "/") as $sub_file) {
+            if ($sub_file[0] == '.') {
+                continue;
+            }
+            if (is_dir($input->thumb_dir . "/" . $sub_file)) {
+                $RETURN = $this->search_imgs_sub_dir($input, $dir . "/" . $sub_file);
+                if ($RETURN == 0)
+                    continue;
+                return 1;
+            }
+        }
+        return 0;
+    }
 
     /**
      *   public function search_imgs
-     *   @param Branches
-     *   &$input Search through files for prefabricated data
+     *   @param Branches &$input   Search through files for prefabricated data
      *
      *   Searches for and finds thumbnail_img
      *   name.
@@ -110,42 +144,44 @@ class Tier
     {
 
         $png = new PNG();
-        $input->crops = null;
         $perc = [];
         $bri_array = [];
         $RETURN = 1;
+        
+        $this->search_imgs_sub_dir($input, "");
 
-        $bri = (file_get_contents($input->image_sha1));
+        $bri = (file_get_contents($input->thumb_dir));
         echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/>";
         echo json_encode($input->keywords) . "<br/>";
         $cont = 1;
         foreach (scandir(__DIR__ . "/../dataset/") as $file) {
-            if ($file[0] == '.' || is_dir(__DIR__ . "/../dataset/" . $file)) {
+            if ($file[0] == '.') {
+                continue;
+            }
+            $svf_in = new Branches();
+            $svf_in->thumb_dir = __DIR__ . "/../dataset/";
+            $svf_in->crops[0] = $file;
+            if (is_dir(__DIR__ . "/../dataset/" . $file)) {
+                $this->search_imgs_sub_dir($svf_in, "");
                 continue;
             }
             if (filesize(__DIR__ . "/../dataset/" . $file) == 0) {
                 continue;
             }
-            if (__DIR__ . "/../dataset/" . $file == $input->image_sha1) {
-
-            }
-
-            $svf = (file_get_contents(__DIR__ . "/../dataset/" . $file));
+            $svf = (file_get_contents($svf_in->thumb_dir . $file));
             $i = 0;
             $intersect = 0;
             while ($i < strlen($bri) && $i < strlen($svf)) {
-                if ($bri[$i] == $svf[$i]){
+                if ($bri[$i] == $svf[$i]) {
                     $intersect++;
-                }
-                else if ($intersect/$i < 0.0004) {
-                //    break;
                 }
                 $i++;
             }
-            //similar_text($bri, $svf, $intersect);
-            
             if ($intersect / $i > 0.070) {
-                $input->crops = array($file, $intersect / $i);
+                $dir = \explode('\\',$svf_in->thumb_dir);
+                $dir = \explode('/',$dir[count($dir)-1]);
+                //echo json_encode($dir);
+                $input->crops = array($file, $intersect / $i, $dir[3]);
                 $this->label_search($input);
                 $RETURN = 0;
                 flush();
@@ -165,7 +201,7 @@ class Tier
      */
     public function label_search(Branches &$filename)
     {
-        $temp = ($filename->crops);
+        $temp = (array) ($filename->crops);
         if ($temp[1] == 100) {
             return 1;
         }
@@ -176,17 +212,17 @@ class Tier
             if ($this->head[$i]->origin == $filename->origin) {
                 continue;
             }
-            if (count($this->head) > $i && isset($temp[0]) && in_array($temp[0], array_unique($array_temp))) {
+            if (count($this->head) > $i && isset($temp) && count($temp) > 1 && in_array($temp[0], array_unique($array_temp))) {
                 echo "<img tag='" . $this->head[$i]->crops[0] . "' src='" . $this->head[$i]->origin . "' style='height:70px;width:70px'/>";
                 echo json_encode($this->head[$i]->keywords) . " ";
-                echo $temp[1] . "% Correct<br/>";
+                
+                //if ($this->head[$i]->cat != "") {
+                    echo $temp[2] . " ";
+               # }
+                echo round($temp[1],4) . "% Correct<br/>";
                 return 1;
-                //$filename->crops = null;
-                //$array_temp = (array) ($this->head[++$i]->crops);
             }
         }
-        // echo "<img src='" . $this->head[$i]->origin . "' style='height:70px;width:70px'/>";
-        // echo $temp[1] . "% Correct<br/>";
     }
 
     /**
