@@ -26,6 +26,7 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     $branch1->origin = dirname(__NAMESPACE__) . "/PHP/../origin/" . $file;
     echo $file . " ";
     $branch1->keywords = array($x, "dci");
+    $branch1->cat = "dog";
     $node = $png->find_tier($branch1);
     $dataset->insert_branch($node);
     

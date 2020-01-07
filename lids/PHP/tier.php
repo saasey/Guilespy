@@ -121,7 +121,7 @@ class Tier
             }
             if (is_dir($input->thumb_dir . "/" . $sub_file)) {
                 $RETURN = $this->search_imgs_sub_dir($input, $dir . "/" . $sub_file);
-                if ($RETURN == 0)
+                if (is_int($RETURN) && $RETURN == 0)
                     continue;
                 return $RETURN;
             }

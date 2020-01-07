@@ -61,10 +61,13 @@ class PNG
     {
         
         $file_sha = hash_file('SHA1', $src->origin, false) . "yv";
-        $src->image_sha1 = (__DIR__) . "/../dataset/" . $file_sha;
+        if (!is_dir((__DIR__) . "/../dataset/$src->cat/") && $src->cat != "dataset")
+            \mkdir((__DIR__) . "/../dataset/$src->cat/");
+        $src->image_sha1 = (__DIR__) . "/../dataset/$src->cat/" . $file_sha;
         $src->crops = array($file_sha, 0);
-        if ($this->search_imgs_sub_dir($src, "") == 1) {
-            $src->image_sha1 = $src->thumb_dir . "/" . $file_sha;
+
+        if ($this->search_imgs_sub_dir($src, "$src->cat") == 1) {
+            //$src->image_sha1 = $src->thumb_dir . "/$src->cat/" . $file_sha;
             return $src;
         }
         $scale = imagecreatefromstring(file_get_contents($src->origin));
