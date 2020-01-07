@@ -198,7 +198,7 @@ class Tier
     public function label_search(Branches &$filename)
     {
         $temp = (array) ($filename->crops);
-        if ($temp[1] == 100) {
+        if (isset($temp) && count($temp) > 1 && $temp[1] == 100) {
             return 1;
         }
 

@@ -42,12 +42,13 @@ $branch2 = new Branches();
 $branch2->origin = dirname(__FILE__) . "/lids/php" . "/../origin/00002.JPG";
 
 $branch2->keywords = array("2", ":P pic");
+$branch2->cat = "cars";
 $dataset->relabel_img($branch2, array("test", "to", "death"));
 $dataset->label_search($branch2);
 
 $object_var = new PNG();
 $branch3 = new Branches();
-$object_for_action = new Tier();
+$branch3->cat = "cars";
 
 $branch3->origin = dirname(__FILE__) . "/lids/php" . "/../origin/00024.JPG";
 $node = $object_var->find_tier($branch3);
@@ -58,4 +59,4 @@ $dataset->label_search($node);
 // save your latest dataset(common list)
 $dataset->save_dataset("save.txt");
 
-echo "Took " . time() - $start_timer . " seconds to complete";
+echo "Took " . (time() - $start_timer) . " seconds to complete";
