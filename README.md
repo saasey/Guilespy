@@ -3,6 +3,16 @@ lids AI API
 Package is fully functional.
 
 
+1/7/2020
+
+v3.0.1 - Missed a journal again. Sorry. Lost my computer.
+    Happy New Year! Anyway, God bless you all. This is
+    going to be one of the final updates to this repo.
+    In order to categorize the information, you will need
+    to set a Tier object's public member variable 'cat'
+    before you send it to ->find_tier(). This will make
+    the directory. Name it right because it will show in
+    the results. Thank you all!
 
 12/27/2019
 
