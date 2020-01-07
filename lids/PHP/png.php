@@ -29,6 +29,9 @@ class PNG
         if (file_exists(__DIR__ . "/../dataset/$dir/" . $input->crops[0])) {
             $input->thumb_dir .= "/$dir";
             $input->crops[2] = $dir;
+            $dir2 = \explode('\\',$input->thumb_dir);
+            $dir2 = \explode('/',$dir2[count($dir2)-1]);
+            $input->cat = json_encode($dir2[4]);
             return 1;
         }
         foreach (scandir(__DIR__ . "/../dataset/$dir/") as $sub_file) {

@@ -110,12 +110,10 @@ class Tier
         $RETURN = 0;
         if (file_exists($input->thumb_dir . "/" . "$dir/" . $input->crops[0])) {
             $input->thumb_dir .= "$dir/" . $input->crops[0];
-            $input->crops[2] = $dir;
             
             $dir2 = \explode('\\',$input->thumb_dir);
             $dir2 = \explode('/',$dir2[count($dir2)-1]);
-            echo $dir . "..";
-            return 1;
+            return $input;
         }
         foreach (scandir(__DIR__ . "/../dataset/" . $dir . "/") as $sub_file) {
             if ($sub_file[0] == '.') {
@@ -125,7 +123,7 @@ class Tier
                 $RETURN = $this->search_imgs_sub_dir($input, $dir . "/" . $sub_file);
                 if ($RETURN == 0)
                     continue;
-                return 1;
+                return $RETURN;
             }
         }
         return 0;
@@ -161,14 +159,15 @@ class Tier
             $svf_in = new Branches();
             $svf_in->thumb_dir = __DIR__ . "/../dataset/";
             $svf_in->crops[0] = $file;
+            $svf_in->cat = "";
             if (is_dir(__DIR__ . "/../dataset/" . $file)) {
                 $this->search_imgs_sub_dir($svf_in, "");
+            }
+            else if (filesize(__DIR__ . "/../dataset/" . $file) == 0) {
                 continue;
             }
-            if (filesize(__DIR__ . "/../dataset/" . $file) == 0) {
-                continue;
-            }
-            $svf = (file_get_contents($svf_in->thumb_dir . $file));
+            else
+                $svf = (file_get_contents($svf_in->thumb_dir . $file));
             $i = 0;
             $intersect = 0;
             while ($i < strlen($bri) && $i < strlen($svf)) {
@@ -178,10 +177,7 @@ class Tier
                 $i++;
             }
             if ($intersect / $i > 0.070) {
-                $dir = \explode('\\',$svf_in->thumb_dir);
-                $dir = \explode('/',$dir[count($dir)-1]);
-                //echo json_encode($dir);
-                $input->crops = array($file, $intersect / $i, $dir[3]);
+                $input->crops = array($file, $intersect / $i);
                 $this->label_search($input);
                 $RETURN = 0;
                 flush();
@@ -215,10 +211,7 @@ class Tier
             if (count($this->head) > $i && isset($temp) && count($temp) > 1 && in_array($temp[0], array_unique($array_temp))) {
                 echo "<img tag='" . $this->head[$i]->crops[0] . "' src='" . $this->head[$i]->origin . "' style='height:70px;width:70px'/>";
                 echo json_encode($this->head[$i]->keywords) . " ";
-                
-                //if ($this->head[$i]->cat != "") {
-                    echo $temp[2] . " ";
-               # }
+                echo $this->head[$i]->cat . " ";
                 echo round($temp[1],4) . "% Correct<br/>";
                 return 1;
             }
