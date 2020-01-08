@@ -9,7 +9,7 @@ namespace lids\PHP;
  * Shrinks files to just above "ambiguous" state
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.1
+ * @api 3.0.2
  */
 class PNG
 {

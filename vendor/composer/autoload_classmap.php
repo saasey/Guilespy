@@ -7,6 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'lids\\PHP\\Branches' => $baseDir . '/lids/PHP/branches.php',
+    'lids\\PHP\\CSV' => $baseDir . '/lids/PHP/csv.php',
     'lids\\PHP\\PNG' => $baseDir . '/lids/PHP/png.php',
+    'lids\\PHP\\Save' => $baseDir . '/lids/PHP/save.php',
     'lids\\PHP\\Tier' => $baseDir . '/lids/PHP/tier.php',
 );

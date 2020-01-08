@@ -1,7 +1,14 @@
-<?php declare(strict_types = 1);
+<?php declare (strict_types = 1);
 
 namespace lids\PHP;
 
+/**
+ * Save Class
+ *
+ * @author David Pulse <inland14@live.com>
+ * @api 3.0.2
+ * 
+ */
 class Save {
 
     /**

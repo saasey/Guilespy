@@ -8,7 +8,9 @@ class ComposerStaticInit5ff4a9c89b67e935cb343c9da5afadfc
 {
     public static $classMap = array (
         'lids\\PHP\\Branches' => __DIR__ . '/../..' . '/lids/PHP/branches.php',
+        'lids\\PHP\\CSV' => __DIR__ . '/../..' . '/lids/PHP/csv.php',
         'lids\\PHP\\PNG' => __DIR__ . '/../..' . '/lids/PHP/png.php',
+        'lids\\PHP\\Save' => __DIR__ . '/../..' . '/lids/PHP/save.php',
         'lids\\PHP\\Tier' => __DIR__ . '/../..' . '/lids/PHP/tier.php',
     );
 
