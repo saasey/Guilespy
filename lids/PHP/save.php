@@ -41,7 +41,7 @@ class Save {
         if (!is_a($t, "Tier")) {
             $t = new Tier();
         }
-        return $t;
+        return unserialize($file);
     }
 }
 

@@ -12,11 +12,12 @@ $png = new PNG();
 
 $dataset = new Tier();
 // load your last saved common list
-$dataset->save->load_dataset($dataset, "save.txt");
+$dataset->head = $dataset->save->load_dataset($dataset, "save.txt");
 
 //instantiate new Branches() object
 // Fill in `origin` and `thumb_dir`
 // and keywords
+
 $x = 0;
 foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     if ($file[0] == '.') {
@@ -27,9 +28,11 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     echo $file . " ";
     $branch1->keywords = array($x, "dci");
     $branch1->cat = "dog";
+    // create new input
     $node = $png->find_tier($branch1);
+    // insert input ($node) into tree
     $dataset->insert_branch($node);
-    
+    // Find matches
     $dataset->search_imgs($node);
 
     $x++;
@@ -39,22 +42,26 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
 
 echo "<hr/>";
 $branch2 = new Branches();
-$branch2->origin = dirname(__FILE__) . "/lids/php" . "/../origin/00002.JPG";
+$branch2->origin = dirname(__NAMESPACE__) . "/php" . "/../origin/00002.JPG";
 
+$branch2 = $dataset->retrieve_branch($branch2);
 $branch2->keywords = array("2", ":P pic");
-$branch2->cat = "cars";
-$dataset->relabel_img($branch2, array("test", "to", "death"));
-$dataset->label_search($branch2);
 
-$object_var = new PNG();
+$dataset->relabel_img($branch2, $branch2->keywords);
+
+$dataset->search_imgs($branch2);
+
 $branch3 = new Branches();
-$branch3->cat = "cars";
 
-$branch3->origin = dirname(__FILE__) . "/lids/php" . "/../origin/00024.JPG";
-$node = $object_var->find_tier($branch3);
-$dataset->relabel_img($node, array("therein", "we", "go"));
+$branch3->origin = dirname(__NAMESPACE__) . "/php" . "/../origin/00024.JPG";
 
-$dataset->label_search($node);
+$branch3 = $dataset->retrieve_branch($branch3);
+$branch3->keywords = array("24", "hyuk, gee whiz!");
+
+$dataset->relabel_img($branch3, $branch3->keywords);
+
+$dataset->search_imgs($branch3);
+
 // Let's get both of our labels here
 // save your latest dataset(common list)
 $dataset->save->save_dataset($dataset, "save.txt");

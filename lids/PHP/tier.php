@@ -33,6 +33,23 @@ class Tier extends PNG
     }
 
     /**
+     *   public function retrieve_branch
+     *   @param Branches $img The Branch object you want to add
+     *
+     *   Retrieve node in common list
+     *
+     *  @return void
+     */
+    public function retrieve_branch(Branches $img)
+    {
+        foreach ($this->head as $k) {
+            if (strtolower($k->origin) == strtolower($img->origin))
+                return $k;
+        }
+        return null;
+    }
+
+    /**
      *   public function insert_branch
      *   @param Branches $img The Branch object you want to add
      *
@@ -171,10 +188,10 @@ class Tier extends PNG
      */
     public function relabel_img(Branches $filename, array $newkeywords)
     {
-        for ($i = 0; $i < sizeof($this->head); $i++) {
-            $array_temp = (array) ($this->head[$i]->crops);
+        foreach ($this->head as $k) {
+            $array_temp = (array) ($k->crops);
             if (in_array($filename->crops, $array_temp)) {
-                $this->head[$i]->keywords = $newkeywords;
+                $k->keywords = $newkeywords;
                 return;
             }
         }
