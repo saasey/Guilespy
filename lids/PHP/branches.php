@@ -33,11 +33,18 @@ class Branches {
     public $thumb_dir;
   
     /**
-     * holds temporary image data
+     * holds image path and name
      *
      * @var string
      */
     public $image_sha1;
+
+    /**
+     * holds hashed image name
+     *
+     * @var string
+     */
+    public $sha_name;
   
     /**
      * holds the image crops

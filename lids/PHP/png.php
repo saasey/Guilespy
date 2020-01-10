@@ -23,30 +23,43 @@ class PNG
      *
      *   @return bool
      */
-    public function search_imgs_sub_dir(Branches &$input, string $dir)
+    public function search_imgs_sub_dir(Tier $tier, Branches &$input, string $dir, string $bri)
     {
         $RETURN = 0;
-        if (file_exists(__DIR__ . "/../dataset/$dir/" . $input->crops[0])) {
-            if (is_dir($input->thumb_dir . "/$dir"))
-                $input->thumb_dir .= "/$dir/" . $input->crops[0];
-            $dir2 = \explode('\\',$input->thumb_dir);
-            $dir2 = \explode('/',$dir2[count($dir2)-1]);
-            $input->cat = $dir2[4];
-            return $input;
-        }
-        foreach (scandir(__DIR__ . "/../dataset/$dir/") as $sub_file) {
-            if ($sub_file[0] == '.') {
+        foreach (scandir($dir) as $sub_file) {
+            if ($sub_file == '.' || $sub_file == "..") {
                 continue;
             }
-            if (is_dir(__DIR__ . "/../dataset/$dir/" . $sub_file)) {
-                $RETURN = $this->search_imgs_sub_dir($input, $dir . $sub_file);
-                if (is_int($RETURN))
-                    continue;
-                return $RETURN;
+            if (is_dir($dir . $sub_file)) {
+                echo $sub_file;
+                $tier->search_imgs_sub_dir($tier, $input, $dir . $sub_file, $bri);
             }
-
+            $input->image_sha1 = $dir . "/" . $sub_file;
+            $input->crops[0] = $sub_file;
+            $tier->img_contrast($tier, $input, $bri);
         }
         return 0;
+    }
+
+    public function img_contrast(Tier $tier, Branches $input, string $bri) {
+
+        $svf = \file_get_contents($input->image_sha1);
+        $i = 0;
+        $intersect = 0;
+        while ($i < strlen($bri) && $i < strlen($svf)) {
+            if ($bri[$i] == $svf[$i]) {
+                $intersect++;
+            }
+            $i++;
+        }
+        if ($i > 0 && $intersect / $i > 0.070) {
+            $input->origin = $tier->retrieve_branch_sha($input->crops[0]);
+            $input->crops = array($input->crops[0], $intersect / $i);
+            $tier->label_search($input);
+            $RETURN = 0;
+            flush();
+            \ob_flush();
+        }
     }
 
     /**
@@ -60,13 +73,13 @@ class PNG
     public function find_tier(Branches $src)
     {
         
-        $file_sha = hash_file('SHA1', $src->origin, false);
+        $src->sha_name = hash_file('SHA1', $src->origin, false);
         if (!is_dir((__DIR__) . "/../dataset/$src->cat/") && $src->cat != "dataset")
             \mkdir((__DIR__) . "/../dataset/$src->cat/");
-        $src->image_sha1 = (__DIR__) . "/../dataset/$src->cat/" . $file_sha;
-        $src->crops = array($file_sha, 0);
+        $src->image_sha1 = (__DIR__) . "/../dataset/$src->cat/" . $src->sha_name;
+        $src->crops = array($src->sha_name, 0);
 
-        if (!is_int($this->search_imgs_sub_dir($src, ""))) {
+        if (\file_exists($src->image_sha1)) {
             return $src;
         }
         $scale = imagecreatefromstring(file_get_contents($src->origin));

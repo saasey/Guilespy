@@ -18,7 +18,7 @@ class Tier extends PNG
      * @var Branches
      */
     public $head;
-    
+
     /**
      * holds the Save file IO object
      *
@@ -40,11 +40,32 @@ class Tier extends PNG
      *
      *  @return void
      */
-    public function retrieve_branch(Branches $img)
+    public function retrieve_branch_origin(Branches $img)
     {
         foreach ($this->head as $k) {
-            if (strtolower($k->origin) == strtolower($img->origin))
+            if (strtolower($k->origin) == strtolower($img->origin)) {
                 return $k;
+            }
+
+        }
+        return null;
+    }
+
+    /**
+     *   public function retrieve_branch
+     *   @param Branches $img The Branch object you want to add
+     *
+     *   Retrieve node in common list
+     *
+     *  @return void
+     */
+    public function retrieve_branch_sha(string $img)
+    {
+        foreach ($this->head as $k) {
+            if (strtolower($k->sha_name) == strtolower($img)) {
+                return $k;
+            }
+
         }
         return null;
     }
@@ -105,9 +126,7 @@ class Tier extends PNG
         $bri_array = [];
         $RETURN = 1;
 
-        $this->search_imgs_sub_dir($input, "");
-
-        $bri = (file_get_contents($input->thumb_dir));
+        $bri = (file_get_contents($input->image_sha1));
         echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/>";
         echo json_encode($input->keywords) . "<br/>";
         $cont = 1;
@@ -117,31 +136,13 @@ class Tier extends PNG
             }
             $svf_in = new Branches();
             $svf_in->thumb_dir = __DIR__ . "/../dataset/";
-            $svf_in->crops[0] = $file;
             $svf_in->cat = "";
             if (is_dir(__DIR__ . "/../dataset/" . $file)) {
-                $this->search_imgs_sub_dir($svf_in, "");
-            } else if (filesize(__DIR__ . "/../dataset/" . $file) == 0) {
+                $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/" . $file, $bri);
+            }
+            else
                 continue;
-            } else {
-                $svf = (file_get_contents($svf_in->thumb_dir . $file));
-            }
 
-            $i = 0;
-            $intersect = 0;
-            while ($i < strlen($bri) && $i < strlen($svf)) {
-                if ($bri[$i] == $svf[$i]) {
-                    $intersect++;
-                }
-                $i++;
-            }
-            if ($intersect / $i > 0.070) {
-                $input->crops = array($file, $intersect / $i);
-                $this->label_search($input);
-                $RETURN = 0;
-                flush();
-                \ob_flush();
-            }
         }
         return $RETURN;
     }
@@ -160,17 +161,15 @@ class Tier extends PNG
         if (isset($temp) && count($temp) > 1 && $temp[1] == 100) {
             return 1;
         }
+        foreach ($this->head as $hd) {
 
-        for ($i = 0; $i < sizeof($this->head); $i++) {
-            $array_temp = (array) ($this->head[$i]->crops);
-
-            if ($this->head[$i]->origin == $filename->origin) {
+            if ($hd->origin == $filename->origin) {
                 continue;
             }
-            if (count($this->head) > $i && isset($temp) && count($temp) > 1 && in_array($temp[0], array_unique($array_temp))) {
-                echo "<img tag='" . $this->head[$i]->crops[0] . "' src='" . $this->head[$i]->origin . "' style='height:70px;width:70px'/>";
-                echo json_encode($this->head[$i]->keywords) . " ";
-                echo $this->head[$i]->cat . " ";
+            if ($filename->crops[0] == $hd->crops[0]) {
+                echo "<img tag='" . $hd->crops[0] . "' src='" . $hd->origin . "' style='height:70px;width:70px'/>";
+                echo json_encode($hd->keywords) . " ";
+                echo $hd->cat . " ";
                 echo round($temp[1], 4) . "% Correct<br/>";
                 return 1;
             }

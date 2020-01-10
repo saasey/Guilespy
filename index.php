@@ -44,7 +44,7 @@ echo "<hr/>";
 $branch2 = new Branches();
 $branch2->origin = dirname(__NAMESPACE__) . "/php" . "/../origin/00002.JPG";
 
-$branch2 = $dataset->retrieve_branch($branch2);
+$branch2 = $dataset->retrieve_branch_origin($branch2);
 $branch2->keywords = array("2", ":P pic");
 
 $dataset->relabel_img($branch2, $branch2->keywords);
@@ -55,7 +55,7 @@ $branch3 = new Branches();
 
 $branch3->origin = dirname(__NAMESPACE__) . "/php" . "/../origin/00024.JPG";
 
-$branch3 = $dataset->retrieve_branch($branch3);
+$branch3 = $dataset->retrieve_branch_origin($branch3);
 $branch3->keywords = array("24", "hyuk, gee whiz!");
 
 $dataset->relabel_img($branch3, $branch3->keywords);
