@@ -27,13 +27,21 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     $branch1->origin = dirname(__NAMESPACE__) . "/PHP/../origin/" . $file;
     echo $file . " ";
     $branch1->keywords = array($x, "dci");
-    $node = $dataset->recover_branch($branch1);
+    $node = new Branches();
+    $branch1->cat = "car";
+    if (($node = $dataset->recover_branch($branch1)) == null) {
+        $node = $png->find_tier($branch1);
+        $dataset->search_imgs($branch1);
+        $dataset->insert_branch($node);
+    }
+    else {
+        $dataset->search_imgs($node);
+    }
     // create new input
-    //$node = $png->find_tier($branch1);
+    
     // insert input ($node) into tree
-    $dataset->insert_branch($node);
     // Find matches
-    $dataset->search_imgs($node);
+    
 
     $x++;
     if ($x == 25)

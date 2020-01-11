@@ -47,7 +47,7 @@ class Tier extends PNG
 
         foreach ($this->head as $k) {
             if (strtolower($k->origin) == strtolower($img->origin)) {
-                return $k;
+                return ($k);
             }
 
         }
@@ -69,7 +69,7 @@ class Tier extends PNG
 
         foreach ($this->head as $k) {
             if (strtolower($k->sha_name) == strtolower($img)) {
-                return $k;
+                return ($k);
             }
 
         }
@@ -92,6 +92,28 @@ class Tier extends PNG
     }
     
     /**
+     *   public function replace_branch
+     *   @param Branches &$node Branch to check for existence and add
+     *
+     *   Inserts new images at end of common list
+     *
+     *  @return bool
+     */
+    public function replace_branch(Tier $tier, Branches &$node)
+    {
+        foreach ($tier->head as $hd) {
+
+            if ($hd->origin == $node->origin) {
+                continue;
+            }
+            if ($node->sha_name == $hd->sha_name) {
+                $hd = $node;
+                return 1;
+            }
+        }
+    }
+
+    /**
      *   public function find_file
      *   @param Branches &$node Branch to check for existence and add
      *
@@ -109,7 +131,6 @@ class Tier extends PNG
             if (\file_exists(__DIR__ . "/../dataset/$folder/" . $node->sha_name)) {
                 if (($temp_node = $this->retrieve_branch_sha($node->sha_name)) != null) {
                     $temp_node->cat = $folder;
-                    //$this->search_imgs($temp_node);
                     return $temp_node;
                 } else if (($temp_node = $this->retrieve_branch_sha($node->sha_name)) == null) {
                     return $this->find_tier($node);
@@ -128,10 +149,6 @@ class Tier extends PNG
      */
     public function recover_branch(Branches &$node)
     {
-        if (!is_array($node->keywords)) {
-            echo "Keywords must be an array. <br/>Please modify $node->origin's Keywords.";
-            return $node;
-        }
         $png = new PNG();
         $temp_node = $node;
         
@@ -141,8 +158,7 @@ class Tier extends PNG
         else if ($node->sha_name != "" && ($temp_node = $this->retrieve_branch_sha($node->sha_name)) != null) {
             return $temp_node;
         }
-        return $this->find_file($node);
-        null;
+        return null;
     }
 
     /**
@@ -162,21 +178,22 @@ class Tier extends PNG
         $bri_array = [];
         $RETURN = 1;
 
-        $input = $this->recover_branch($input);
+        if (($temp = $this->recover_branch($input)) == null)
+            $input = $this->find_tier($input);
+        else
+            $input = file_get_contents($temp);
 
         $bri = (file_get_contents($input->image_sha1));
         echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/>";
         echo json_encode($input->keywords) . "<br/>";
 
-        foreach (scandir(__DIR__ . "/../dataset/") as $file) {
-            if ($file[0] == '.') {
+        foreach (scandir(__DIR__ . "/../dataset/") as $folder) {
+            if ($folder[0] == '.') {
                 continue;
             }
             $svf_in = new Branches();
-            $svf_in->thumb_dir = __DIR__ . "/../dataset/";
-            $svf_in->cat = "";
-            if (is_dir(__DIR__ . "/../dataset/" . $file)) { 
-                $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/" . $file, $bri);
+            if (is_dir(__DIR__ . "/../dataset/" . $folder)) { 
+                $input = $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/" . $folder, $bri, true);
             } else {
                 continue;
             }
@@ -199,6 +216,8 @@ class Tier extends PNG
         if (isset($temp) && count($temp) > 1 && $temp[1] == 100) {
             return 1;
         }
+        if (is_array($this->head) && sizeof($this->head) == 0)
+            return 0;
         foreach ($this->head as $hd) {
 
             if ($hd->origin == $filename->origin) {
@@ -207,7 +226,7 @@ class Tier extends PNG
             if ($filename->crops[0] == $hd->crops[0]) {
                 echo "<img tag='" . $hd->crops[0] . "' src='" . $hd->origin . "' style='height:70px;width:70px'/>";
                 echo json_encode($hd->keywords) . " ";
-                echo $hd->cat . " ";
+                echo json_encode($hd->cat)  . " ";
                 echo round($temp[1], 4) . "% Correct<br/>";
                 return 1;
             }

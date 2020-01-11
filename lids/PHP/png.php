@@ -23,27 +23,28 @@ class PNG
      *
      *   @return bool
      */
-    public function search_imgs_sub_dir(Tier $tier, Branches &$input, string $dir, string $bri)
+    public function search_imgs_sub_dir(Tier $tier, Branches &$input, string $dir, string $bri, bool $opt = false)
     {
-        $RETURN = 0;
+        $output = new Branches();
         foreach (scandir($dir) as $sub_file) {
             if ($sub_file == '.' || $sub_file == "..") {
                 continue;
             }
             if (is_dir($dir . $sub_file)) {
                 echo $sub_file;
-                $tier->search_imgs_sub_dir($tier, $input, $dir . $sub_file, $bri);
+                $tier->search_imgs_sub_dir($tier, $input, $dir . "/" . $sub_file, $bri);
             }
-            $input->image_sha1 = $dir . "/" . $sub_file;
-            $input->crops[0] = $sub_file;
-            $tier->img_contrast($tier, $input, $bri);
+            $txt_arr = explode('/', $dir);
+            $input->cat[] = $txt_arr[count($txt_arr) - 1 ];
+            if ($opt == true)
+                $tier->img_contrast($tier, $dir . "/" . $sub_file, $sub_file, $bri);
         }
-        return 0;
+        return $input;
     }
 
-    public function img_contrast(Tier $tier, Branches $input, string $bri) {
+    public function img_contrast(Tier $tier, string $image_sha1, string $file, string $bri) {
 
-        $svf = \file_get_contents($input->image_sha1);
+        $svf = \file_get_contents($image_sha1);
         $i = 0;
         $intersect = 0;
         while ($i < strlen($bri) && $i < strlen($svf)) {
@@ -53,8 +54,9 @@ class PNG
             $i++;
         }
         if ($i > 0 && $intersect / $i > 0.068) {
-            $input->origin = $tier->retrieve_branch_sha($input->crops[0]);
-            $input->crops = array($input->crops[0], $intersect / $i);
+            $input = new Branches();
+            $input->origin = $tier->retrieve_branch_sha($file);
+            $input->crops = array($file, $intersect / $i);
             $tier->label_search($input);
             $RETURN = 0;
             flush();
@@ -74,12 +76,20 @@ class PNG
     {
         
         $src->sha_name = hash_file('SHA1', $src->origin, false);
-        if ($src->cat == "") {
-            $src->cat = "misc";
+        //$temp = "";
+        if ((!is_array($src->cat)) ^ (\is_array($src->cat) && count($src->cat) == 0)) {
+            $temp = $src->cat;
+            if ($src->cat == "")
+                $src->cat[0] = "misc";
+            else{
+                $src->cat = [];
+                $src->cat[] = $temp;
+            }
         }
-        if (!is_dir((__DIR__) . "/../dataset/$src->cat/"))
-            \mkdir((__DIR__) . "/../dataset/$src->cat/");
-        $src->image_sha1 = (__DIR__) . "/../dataset/$src->cat/" . $src->sha_name;
+        if (is_array($src->cat) && count($src->cat) >= 1 && !is_dir((__DIR__) . "/../dataset/" . $src->cat[0] . "/")) {
+            \mkdir((__DIR__) . "/../dataset/" . $src->cat[0] . "/");
+        }
+        $src->image_sha1 = str_replace('\\', '/', (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
         $src->crops = array($src->sha_name, 0);
 
         if (\file_exists($src->image_sha1)) {
@@ -87,10 +97,10 @@ class PNG
         }
         $scale = imagecreatefromstring(file_get_contents($src->origin));
         
-        \imagepng($scale,$src->image_sha1);
+        \imagepng($scale,(__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
         
         #$img = imagecreatefrompng($src->image_sha1);
-        $this->get_weighted_state($scale, $src->image_sha1);
+        $this->get_weighted_state($scale, (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
 
         return $src;
     }

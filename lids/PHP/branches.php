@@ -61,10 +61,9 @@ class Branches {
     public $cat;
     
     public function __construct() {
-        $this->thumb_dir = dirname(__DIR__) . "/PHP/../dataset";
         $this->crops = [];
         $this->image_sha1 = "";
-        $this->cat = "";
+        $this->cat = [];
     }
 
     /**
@@ -77,10 +76,6 @@ class Branches {
      */
     public function add_branch_img(Branches &$node)
     {
-        if (!is_array($node->keywords)) {
-            echo "Keywords must be an array. <br/>Please modify $node->origin's Keywords.";
-            return $node;
-        }
         $png = new PNG();
         $node = $png->find_tier($node);
 
@@ -90,7 +85,6 @@ class Branches {
 
         return $node;
     }
-
 
 }
 
