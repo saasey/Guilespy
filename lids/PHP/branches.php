@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Branches Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.4
+ * @api 3.0.2
  * 
  */
 class Branches {
@@ -63,27 +63,7 @@ class Branches {
     public function __construct() {
         $this->crops = [];
         $this->image_sha1 = "";
-        $this->cat = [];
-    }
-
-    /**
-     *   public function add_branch_img
-     *   @param Branches &$node Branch to check for existence and add
-     *
-     *   Inserts new images at end of common list
-     *
-     *  @return bool
-     */
-    public function add_branch_img(Branches &$node)
-    {
-        $png = new PNG();
-        $node = $png->find_tier($node);
-
-        if ($this->search_imgs($node)) {
-            $this->insert_branch($node);
-        }
-
-        return $node;
+        $this->cat = "dataset";
     }
 
 }

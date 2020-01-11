@@ -9,7 +9,7 @@ namespace lids\PHP;
  * Shrinks files to just above "ambiguous" state
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.4
+ * @api 3.0.2
  */
 class PNG
 {
@@ -53,10 +53,9 @@ class PNG
             }
             $i++;
         }
-        if ($i > 0 && $intersect / $i > 0.068) {
-            $input = new Branches();
-            $input->origin = $tier->retrieve_branch_sha($file);
-            $input->crops = array($file, $intersect / $i);
+        if ($i > 0 && $intersect / $i > 0.070) {
+            $input->origin = $tier->retrieve_branch_sha($input->crops[0]);
+            $input->crops = array($input->crops[0], $intersect / $i);
             $tier->label_search($input);
             $RETURN = 0;
             flush();
@@ -76,20 +75,9 @@ class PNG
     {
         
         $src->sha_name = hash_file('SHA1', $src->origin, false);
-        //$temp = "";
-        if ((!is_array($src->cat)) ^ (\is_array($src->cat) && count($src->cat) == 0)) {
-            $temp = $src->cat;
-            if ($src->cat == "")
-                $src->cat[0] = "misc";
-            else{
-                $src->cat = [];
-                $src->cat[] = $temp;
-            }
-        }
-        if (is_array($src->cat) && count($src->cat) >= 1 && !is_dir((__DIR__) . "/../dataset/" . $src->cat[0] . "/")) {
-            \mkdir((__DIR__) . "/../dataset/" . $src->cat[0] . "/");
-        }
-        $src->image_sha1 = str_replace('\\', '/', (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
+        if (!is_dir((__DIR__) . "/../dataset/$src->cat/") && $src->cat != "dataset")
+            \mkdir((__DIR__) . "/../dataset/$src->cat/");
+        $src->image_sha1 = (__DIR__) . "/../dataset/$src->cat/" . $src->sha_name;
         $src->crops = array($src->sha_name, 0);
 
         if (\file_exists($src->image_sha1)) {

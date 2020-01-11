@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Tier Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.4
+ * @api 3.0.2
  *
  */
 class Tier extends PNG
@@ -42,9 +42,6 @@ class Tier extends PNG
      */
     public function retrieve_branch_origin(Branches $img)
     {
-        if (!\is_array($this->head))
-            return null;
-
         foreach ($this->head as $k) {
             if (strtolower($k->origin) == strtolower($img->origin)) {
                 return ($k);
@@ -64,9 +61,6 @@ class Tier extends PNG
      */
     public function retrieve_branch_sha(string $img)
     {
-        if (!\is_array($this->head))
-            return null;
-
         foreach ($this->head as $k) {
             if (strtolower($k->sha_name) == strtolower($img)) {
                 return ($k);
@@ -90,54 +84,6 @@ class Tier extends PNG
         return;
 
     }
-    
-    /**
-     *   public function replace_branch
-     *   @param Branches &$node Branch to check for existence and add
-     *
-     *   Inserts new images at end of common list
-     *
-     *  @return bool
-     */
-    public function replace_branch(Tier $tier, Branches &$node)
-    {
-        foreach ($tier->head as $hd) {
-
-            if ($hd->origin == $node->origin) {
-                continue;
-            }
-            if ($node->sha_name == $hd->sha_name) {
-                $hd = $node;
-                return 1;
-            }
-        }
-    }
-
-    /**
-     *   public function find_file
-     *   @param Branches &$node Branch to check for existence and add
-     *
-     *   Finds images in common list
-     *
-     *  @return bool
-     */
-    public function find_file(Branches $node) {
-
-        $node = $this->find_tier($node);
-        $temp_node = $node;
-        foreach (scandir(__DIR__ . "/../dataset/") as $folder) {
-            if ($folder[0] == ".")
-                continue;
-            if (\file_exists(__DIR__ . "/../dataset/$folder/" . $node->sha_name)) {
-                if (($temp_node = $this->retrieve_branch_sha($node->sha_name)) != null) {
-                    $temp_node->cat = $folder;
-                    return $temp_node;
-                } else if (($temp_node = $this->retrieve_branch_sha($node->sha_name)) == null) {
-                    return $this->find_tier($node);
-                }
-            }
-        }
-    }
 
     /**
      *   public function add_branch_img
@@ -147,18 +93,16 @@ class Tier extends PNG
      *
      *  @return bool
      */
-    public function recover_branch(Branches &$node)
+    public function add_branch_img(Branches &$node)
     {
         $png = new PNG();
-        $temp_node = $node;
-        
-        if ($node->origin != "" && ($temp_node = $this->retrieve_branch_origin($node)) != null) {
-            return $temp_node;
-        } 
-        else if ($node->sha_name != "" && ($temp_node = $this->retrieve_branch_sha($node->sha_name)) != null) {
-            return $temp_node;
+        $node = $png->find_tier($node);
+
+        if ($this->search_imgs($node)) {
+            $this->insert_branch($node);
         }
-        return null;
+
+        return $node;
     }
 
     /**
@@ -178,25 +122,22 @@ class Tier extends PNG
         $bri_array = [];
         $RETURN = 1;
 
-        if (($temp = $this->recover_branch($input)) == null)
-            $input = $this->find_tier($input);
-        else
-            $input = file_get_contents($temp);
-
         $bri = (file_get_contents($input->image_sha1));
         echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/>";
         echo json_encode($input->keywords) . "<br/>";
-
-        foreach (scandir(__DIR__ . "/../dataset/") as $folder) {
-            if ($folder[0] == '.') {
+        $cont = 1;
+        foreach (scandir(__DIR__ . "/../dataset/") as $file) {
+            if ($file[0] == '.') {
                 continue;
             }
             $svf_in = new Branches();
-            if (is_dir(__DIR__ . "/../dataset/" . $folder)) { 
-                $input = $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/" . $folder, $bri, true);
-            } else {
-                continue;
+            $svf_in->thumb_dir = __DIR__ . "/../dataset/";
+            $svf_in->cat = "";
+            if (is_dir(__DIR__ . "/../dataset/" . $file)) {
+                $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/" . $file, $bri);
             }
+            else
+                continue;
 
         }
         return $RETURN;
