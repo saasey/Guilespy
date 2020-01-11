@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Branches Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.2
+ * @api 3.0.4
  * 
  */
 class Branches {
@@ -64,8 +64,33 @@ class Branches {
         $this->thumb_dir = dirname(__DIR__) . "/PHP/../dataset";
         $this->crops = [];
         $this->image_sha1 = "";
-        $this->cat = "dataset";
+        $this->cat = "";
     }
+
+    /**
+     *   public function add_branch_img
+     *   @param Branches &$node Branch to check for existence and add
+     *
+     *   Inserts new images at end of common list
+     *
+     *  @return bool
+     */
+    public function add_branch_img(Branches &$node)
+    {
+        if (!is_array($node->keywords)) {
+            echo "Keywords must be an array. <br/>Please modify $node->origin's Keywords.";
+            return $node;
+        }
+        $png = new PNG();
+        $node = $png->find_tier($node);
+
+        if ($this->search_imgs($node)) {
+            $this->insert_branch($node);
+        }
+
+        return $node;
+    }
+
 
 }
 
