@@ -29,8 +29,9 @@ class PNG
         } else if (is_string($input->cat) && $input->cat == "") {
             $temp[] = "misc";
         } else {
-            echo "Error: Unknown syntax in \$node->cat. It is neither a array nor a string. Choose one!";
-            exit();
+            $temp[] = "misc";
+            //echo "Error: Unknown syntax in \$node->cat. It is neither a array nor a string. Choose one!";
+            //exit();
         }
         foreach ($input as $k => $v) {
             if ($k == "cat")
@@ -54,24 +55,27 @@ class PNG
     {
         $this->correct_for_cat($input);
 
-        foreach (scandir($dir . "/" . $sub_folder) as $sub_file) {
+        foreach (scandir($dir . $sub_folder) as $sub_file) {
             if ($sub_file == '.' || $sub_file == "..") {
                 continue;
             }
             if (is_dir($dir . "/" . $sub_folder . "/" . $sub_file)) {
-                $tier->search_imgs_sub_dir($tier, $input, $dir, $bri, $sub_file, $opt);
+                $tier->search_imgs_sub_dir($tier, $input, $dir, $bri, $sub_folder . "/" . $sub_file, $opt);
+                continue;
             }
-            $input->cat[] = $sub_folder;
+            if (!\file_exists($dir . "/" . $sub_folder . "/" . $sub_file))
+                continue;
+            $input->cat[] = str_replace("/","", $sub_folder);
             $input->image_sha1 = $dir . "/" . $sub_folder . "/" . $sub_file;
 
             if ($opt == true) {
-                $this->img_contrast($this, $input, $dir . "/" . $sub_folder . "/" . $sub_file, $sub_file, $bri);
+                $this->img_contrast($tier, $input, $sub_file, $bri);
             }
         }
         return $input;
     }
 
-    public function img_contrast(Tier $tier, Branches $input, string $image_sha1, string $file, string $bri)
+    public function img_contrast(Tier $tier, Branches $input, string $file, string $bri)
     {
 
         $svf = \file_get_contents($input->image_sha1);

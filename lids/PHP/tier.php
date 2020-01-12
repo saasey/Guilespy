@@ -125,18 +125,11 @@ class Tier extends PNG
         $bri = (file_get_contents($input->image_sha1));
         echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/>";
         echo json_encode($input->keywords) . "<br/>";
-        $cont = 1;
-        foreach (scandir(__DIR__ . "/../dataset/") as $file) {
-            if ($file[0] == '.') {
-                continue;
-            }
-            $svf_in = new Branches();
-            $svf_in->thumb_dir = __DIR__ . "/../dataset/";
-            $svf_in->cat = "";
-            if (is_dir(__DIR__ . "/../dataset/" . $file)) {
-                $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/", $bri, $file, true);
-            }
-        }
+
+        $svf_in = new Branches();
+
+        $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/", $bri, "", true);
+        
         return $RETURN;
     }
 
