@@ -32,7 +32,8 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     $node = $png->find_tier($branch1);
     // insert input ($node) into tree
     // Find matches
-    
+    $dataset->search_imgs($node);
+    $dataset->insert_branch($node);
 
     $x++;
     if ($x == 25)

@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Save Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.2
+ * @api 3.0.5
  * 
  */
 class Save {

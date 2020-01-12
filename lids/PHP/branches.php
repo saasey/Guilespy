@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Branches Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.2
+ * @api 3.0.5
  * 
  */
 class Branches {
@@ -63,7 +63,7 @@ class Branches {
     public function __construct() {
         $this->crops = [];
         $this->image_sha1 = "";
-        $this->cat = "dataset";
+        $this->cat = [];
     }
 
 }

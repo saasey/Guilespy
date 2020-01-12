@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Tier Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.2
+ * @api 3.0.5
  *
  */
 class Tier extends PNG
@@ -134,11 +134,8 @@ class Tier extends PNG
             $svf_in->thumb_dir = __DIR__ . "/../dataset/";
             $svf_in->cat = "";
             if (is_dir(__DIR__ . "/../dataset/" . $file)) {
-                $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/" . $file, $bri);
+                $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/", $bri, $file, true);
             }
-            else
-                continue;
-
         }
         return $RETURN;
     }
@@ -167,7 +164,7 @@ class Tier extends PNG
             if ($filename->crops[0] == $hd->crops[0]) {
                 echo "<img tag='" . $hd->crops[0] . "' src='" . $hd->origin . "' style='height:70px;width:70px'/>";
                 echo json_encode($hd->keywords) . " ";
-                echo json_encode($hd->cat)  . " ";
+                echo json_encode(array_unique($filename->cat))  . " ";
                 echo round($temp[1], 4) . "% Correct<br/>";
                 return 1;
             }

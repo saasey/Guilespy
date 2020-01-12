@@ -9,10 +9,37 @@ namespace lids\PHP;
  * Shrinks files to just above "ambiguous" state
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.2
+ * @api 3.0.5
  */
 class PNG
 {
+
+    /**
+     *   public function correct_for_cat
+     *   @param Branches &$input Make ->cat syntactically corect
+     *
+     *   @return bool
+     */
+    public function correct_for_cat(Branches &$input) {
+        
+        $output = new Branches();
+        $temp = [];
+        if (is_string($input->cat) && $input->cat != "") {
+            $temp[] = $input->cat;
+        } else if (is_string($input->cat) && $input->cat == "") {
+            $temp[] = "misc";
+        } else {
+            echo "Error: Unknown syntax in \$node->cat. It is neither a array nor a string. Choose one!";
+            exit();
+        }
+        foreach ($input as $k => $v) {
+            if ($k == "cat")
+                $output->$k = $temp;
+            else
+                $output->$k = $v;
+        }
+        $input = $output;
+    }
 
     /**
      *   public function search_imgs_sub_dir
@@ -23,28 +50,31 @@ class PNG
      *
      *   @return bool
      */
-    public function search_imgs_sub_dir(Tier $tier, Branches &$input, string $dir, string $bri, bool $opt = false)
+    public function search_imgs_sub_dir(Tier $tier, Branches &$input, string $dir, string $bri, string $sub_folder, bool $opt = false)
     {
-        $output = new Branches();
-        foreach (scandir($dir) as $sub_file) {
+        $this->correct_for_cat($input);
+
+        foreach (scandir($dir . "/" . $sub_folder) as $sub_file) {
             if ($sub_file == '.' || $sub_file == "..") {
                 continue;
             }
-            if (is_dir($dir . $sub_file)) {
-                echo $sub_file;
-                $tier->search_imgs_sub_dir($tier, $input, $dir . "/" . $sub_file, $bri);
+            if (is_dir($dir . "/" . $sub_folder . "/" . $sub_file)) {
+                $tier->search_imgs_sub_dir($tier, $input, $dir, $bri, $sub_file, $opt);
             }
-            $txt_arr = explode('/', $dir);
-            $input->cat[] = $txt_arr[count($txt_arr) - 1 ];
-            if ($opt == true)
-                $tier->img_contrast($tier, $dir . "/" . $sub_file, $sub_file, $bri);
+            $input->cat[] = $sub_folder;
+            $input->image_sha1 = $dir . "/" . $sub_folder . "/" . $sub_file;
+
+            if ($opt == true) {
+                $this->img_contrast($this, $input, $dir . "/" . $sub_folder . "/" . $sub_file, $sub_file, $bri);
+            }
         }
         return $input;
     }
 
-    public function img_contrast(Tier $tier, string $image_sha1, string $file, string $bri) {
+    public function img_contrast(Tier $tier, Branches $input, string $image_sha1, string $file, string $bri)
+    {
 
-        $svf = \file_get_contents($image_sha1);
+        $svf = \file_get_contents($input->image_sha1);
         $i = 0;
         $intersect = 0;
         while ($i < strlen($bri) && $i < strlen($svf)) {
@@ -54,8 +84,7 @@ class PNG
             $i++;
         }
         if ($i > 0 && $intersect / $i > 0.070) {
-            $input->origin = $tier->retrieve_branch_sha($input->crops[0]);
-            $input->crops = array($input->crops[0], $intersect / $i);
+            $input->crops = array($file, $intersect / $i);
             $tier->label_search($input);
             $RETURN = 0;
             flush();
@@ -73,20 +102,33 @@ class PNG
      */
     public function find_tier(Branches $src)
     {
-        
+        $temp = "";
+        if (is_array($src->cat) && count($src->cat) > 0) {
+            $temp = $src->cat[0];
+        } else if (!is_array($src->cat) && $src->cat != "") {
+            $temp = $src->cat;
+        } else if (is_string($src->cat) && $src->cat == "") {
+            $temp = "misc";
+        } else {
+            echo "Error: Unknown syntax in \$node->cat. It is neither a array nor a string. Choose one!";
+            exit();
+        }
+        $src->cat[0] = $temp;
         $src->sha_name = hash_file('SHA1', $src->origin, false);
-        if (!is_dir((__DIR__) . "/../dataset/$src->cat/") && $src->cat != "dataset")
-            \mkdir((__DIR__) . "/../dataset/$src->cat/");
-        $src->image_sha1 = (__DIR__) . "/../dataset/$src->cat/" . $src->sha_name;
+        if (!is_dir((__DIR__) . "/../dataset/" . $src->cat[0] . "/") && $src->cat != "dataset") {
+            \mkdir((__DIR__) . "/../dataset/" . $src->cat[0] . "/");
+        }
+
+        $src->image_sha1 = (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name;
         $src->crops = array($src->sha_name, 0);
 
         if (\file_exists($src->image_sha1)) {
             return $src;
         }
         $scale = imagecreatefromstring(file_get_contents($src->origin));
-        
-        \imagepng($scale,(__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
-        
+
+        \imagepng($scale, (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
+
         #$img = imagecreatefrompng($src->image_sha1);
         $this->get_weighted_state($scale, (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
 
@@ -104,7 +146,7 @@ class PNG
     {
         $width = imagesx($Handle);
         $height = imagesy($Handle);
-        
+
         //After return, send to function comparing
         //weight: how much of formula relies on this
         // X1 \__( ) datapoints
@@ -113,18 +155,18 @@ class PNG
         $sku_width = 127;
         $img = \imagecreatetruecolor(400, $sku_height); // bias can be Height of radiogram/sku (ex. 64,127,256)
         $bg = imagecolorallocate($img, 255, 255, 255);
-        
+
         for ($x = 0; $x < $width; $x++) {
             for ($y = 0; $y < $height; $y++) {
                 $rgb_l1 = imagecolorat($Handle, $x, $y);
-                $max = max((int)($rgb_l1 >> 16) & 0xFF,(int)($rgb_l1 >> 8)%256 & 0xFF,(int)($rgb_l1%256) & 0xFF);
-                $min = min((int)($rgb_l1 >> 16) & 0xFF,(int)($rgb_l1 >> 8)%256 & 0xFF,(int)($rgb_l1%256) & 0xFF);
-                
-                imageline($img, (int)($x)%$sku_width, 0, (int)($x)%$sku_width, $max, $rgb_l1);
-                imageline($img, (int)($x+8), $sku_height - $min, (int)($x+8), $min, $x%512); // Bias! $x + (bias)
+                $max = max((int) ($rgb_l1 >> 16) & 0xFF, (int) ($rgb_l1 >> 8) % 256 & 0xFF, (int) ($rgb_l1 % 256) & 0xFF);
+                $min = min((int) ($rgb_l1 >> 16) & 0xFF, (int) ($rgb_l1 >> 8) % 256 & 0xFF, (int) ($rgb_l1 % 256) & 0xFF);
+
+                imageline($img, (int) ($x) % $sku_width, 0, (int) ($x) % $sku_width, $max, $rgb_l1);
+                imageline($img, (int) ($x + 8), $sku_height - $min, (int) ($x + 8), $min, $x % 512); // Bias! $x + (bias)
             }
         }
-        \imagefilter($img,IMG_FILTER_GRAYSCALE);
-        \imagepng($img,$dest);
+        \imagefilter($img, IMG_FILTER_GRAYSCALE);
+        \imagepng($img, $dest);
     }
 }
