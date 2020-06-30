@@ -3,6 +3,17 @@ lids AI API
 Package is fully functional.
 
 
+6/30/2020
+
+v3.1.0 - Now that I have a computer that can hack it,
+    this project seems saved. I have now made sure that
+    the percentages are right. If you're worried about not
+    getting better percentages, it shouldn't bother you.
+    But if you hack this, goto class PNG and change the
+    percentages in the function image_contrast(). You'll have
+    to do some analyzing for your specific data, but the
+    work is still right. So happy hacking!
+
 1/7/2020
 
 v3.0.1 - Missed a journal again. Sorry. Lost my computer.

@@ -9,10 +9,12 @@ namespace lids\PHP;
  * Shrinks files to just above "ambiguous" state
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.5
+ * @api 3.1.0
  */
 class PNG
 {
+
+    public $epochs = 1;
 
     /**
      *   public function correct_for_cat
@@ -87,7 +89,7 @@ class PNG
             }
             $i++;
         }
-        if ($i > 0 && $intersect / $i > 0.070) {
+        if ($i > 0 && ($intersect / $i > 0.070 && $intersect / $i < 0.08) || $intersect / $i == 1) {
             $input->crops = array($file, $intersect / $i);
             $tier->label_search($input);
             $RETURN = 0;
@@ -134,9 +136,29 @@ class PNG
         \imagepng($scale, (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
 
         #$img = imagecreatefrompng($src->image_sha1);
-        $this->get_weighted_state($scale, (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
+        $this->epoch($src, (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
 
         return $src;
+    }
+
+    /**
+     *   public function epoch
+     *   @param string $Handle Filename and path
+     *
+     *   returns brightness of photos
+     *
+     */
+    public function epoch(&$src, $dest)
+    {
+        $s = 0;
+        $file = $src->origin;
+        while ($s < $this->epochs)
+        {
+            $scale = imagecreatefromstring(file_get_contents($file));
+            \imagepng($scale, (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
+            $file = $this->get_weighted_state($scale, (__DIR__) . "/../dataset/" . $src->cat[0] . "/" . $src->sha_name);
+            $s++;
+        }
     }
 
     /**
@@ -170,7 +192,8 @@ class PNG
                 imageline($img, (int) ($x + 8), $sku_height - $min, (int) ($x + 8), $min, $x % 512); // Bias! $x + (bias)
             }
         }
-        \imagefilter($img, IMG_FILTER_GRAYSCALE);
+        //\imagefilter($img, IMG_FILTER_GRAYSCALE);
         \imagepng($img, $dest);
+        return $dest;
     }
 }

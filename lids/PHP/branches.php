@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Branches Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.5
+ * @api 3.1.0
  * 
  */
 class Branches {

@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Tier Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.0.5
+ * @api 3.1.0
  *
  */
 class Tier extends PNG
@@ -121,7 +121,8 @@ class Tier extends PNG
         $perc = [];
         $bri_array = [];
         $RETURN = 1;
-
+        if (!file_exists($input->image_sha1) || $input->image_sha1 == "" || $input->image_sha1 == null)
+            return 0;
         $bri = (file_get_contents($input->image_sha1));
         echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/>";
         echo json_encode($input->keywords) . "<br/>";
@@ -158,7 +159,8 @@ class Tier extends PNG
                 echo "<img tag='" . $hd->crops[0] . "' src='" . $hd->origin . "' style='height:70px;width:70px'/>";
                 echo json_encode($hd->keywords) . " ";
                 echo json_encode(array_unique($filename->cat))  . " ";
-                echo round($temp[1], 4) . "% Correct<br/>";
+                $percent = ($temp[1] == 1) ? 100 : round($temp[1]*1000,4);
+                echo $percent . "% Correct<br/>";
                 return 1;
             }
         }
