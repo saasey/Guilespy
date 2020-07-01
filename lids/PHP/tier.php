@@ -117,21 +117,19 @@ class Tier extends PNG
     public function search_imgs(Branches &$input)
     {
 
-        $png = new PNG();
-        $perc = [];
-        $bri_array = [];
-        $RETURN = 1;
         if (!file_exists($input->image_sha1) || $input->image_sha1 == "" || $input->image_sha1 == null)
             return 0;
         $bri = (file_get_contents($input->image_sha1));
-        echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/>";
-        echo json_encode($input->keywords) . "<br/>";
+        echo "<table class='card'><tr><td>Image: $input->origin</td></tr>";
+        echo "<tr><td class='top'>";
+        echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/></td></tr>";
+        echo "<tr><td class='bottom'>" . json_encode($input->keywords) . "</td></tr></table>";
 
         $svf_in = new Branches();
 
         $this->search_imgs_sub_dir($this, $svf_in, __DIR__ . "/../dataset/", $bri, "", true);
         
-        return $RETURN;
+        return 1;
     }
 
     /**
@@ -150,17 +148,27 @@ class Tier extends PNG
         }
         if (is_array($this->head) && sizeof($this->head) == 0)
             return 0;
+        
         foreach ($this->head as $hd) {
-
+            
             if ($hd->origin == $filename->origin) {
                 continue;
             }
+            $temp_key = null;
+            if (!is_array($hd->keywords))
+                $temp_key[] = $hd->keywords;
+            else
+                $temp_key = $hd->keywords;
+            $temp_key=implode(', ', $temp_key);
+            
             if ($filename->crops[0] == $hd->crops[0]) {
-                echo "<img tag='" . $hd->crops[0] . "' src='" . $hd->origin . "' style='height:70px;width:70px'/>";
-                echo json_encode($hd->keywords) . " ";
-                echo json_encode(array_unique($filename->cat))  . " ";
+                echo "<table class='card'><tr><td>Keywords: " . $temp_key . "</td></tr>";
+                echo "<tr><td class='child'>";
+                echo "<img src='" . $hd->origin . "' style='height:70px;width:70px'/>";
+                $cat = array_unique($filename->cat);
+                echo implode(', ', $cat)  . " ";
                 $percent = ($temp[1] == 1) ? 100 : round($temp[1]*1000,4);
-                echo $percent . "% Correct<br/>";
+                echo $percent . "% Correct</td></tr></table>";
                 return 1;
             }
         }
