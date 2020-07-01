@@ -123,7 +123,7 @@ class Tier extends PNG
         echo "<table class='card'><tr><td>Image: $input->origin</td></tr>";
         echo "<tr><td class='top'>";
         echo "<img tag='" . $input->image_sha1 . "' src='" . $input->origin . "' style='height:70px;width:70px'/></td></tr>";
-        echo "<tr><td class='bottom'>" . json_encode($input->keywords) . "</td></tr></table>";
+        echo "<tr><td class='bottom'>" . json_encode($input->keywords) . "</td></tr></table><hr width='10%' style='float:left'><br>";
 
         $svf_in = new Branches();
 
@@ -164,11 +164,11 @@ class Tier extends PNG
             if ($filename->crops[0] == $hd->crops[0]) {
                 echo "<table class='card'><tr><td>Keywords: " . $temp_key . "</td></tr>";
                 echo "<tr><td class='child'>";
-                echo "<img src='" . $hd->origin . "' style='height:70px;width:70px'/>";
+                echo "<img src='" . $hd->origin . "' style='height:70px;width:70px'/></td></tr>";
                 $cat = array_unique($filename->cat);
-                echo implode(', ', $cat)  . " ";
+                echo "<tr><td class='child'>" . implode(', ', $cat)  . "</td></tr>";
                 $percent = ($temp[1] == 1) ? 100 : round($temp[1]*1000,4);
-                echo $percent . "% Correct</td></tr></table>";
+                echo "<tr><td class='child'>" . $percent . "% Correct</td></tr></table><br/>";
                 return 1;
             }
         }

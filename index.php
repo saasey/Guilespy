@@ -15,6 +15,7 @@ require "vendor/autoload.php";
     border-color: black;
     border-radius:4px;
     border-spacing:0px,14px;
+    padding-bottom:10px;
 }
 .top {
     border-top: black solid 1px;
@@ -57,9 +58,8 @@ foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
     }
     $branch1 = new Branches();
     $branch1->origin = dirname(__NAMESPACE__) . "/PHP/../origin/" . $file;
-    echo $file . " ";
     $branch1->keywords = array($x, "dci");
-    $branch1->cat[] = "dog";
+    $branch1->cat[] = "Car";
     // create new input
     $node = $png->find_tier($branch1);
     // insert input ($node) into tree
