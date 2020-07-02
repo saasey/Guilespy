@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Tier Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.1.0
+ * @api v3.1.5
  *
  */
 class Tier extends PNG

@@ -6,7 +6,7 @@ namespace lids\PHP;
  * Save Class
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.1.0
+ * @api v3.1.5
  * 
  */
 class Save {
@@ -22,7 +22,6 @@ class Save {
     public function save_dataset(Tier &$t, string $filename)
     {
         $temp = $t->head;
-        $t->head = array_unique($temp, SORT_REGULAR);
         file_put_contents($filename, serialize($t->head));
     }
 
@@ -36,6 +35,8 @@ class Save {
      */
     public function load_dataset(Tier &$t, string $filename)
     {
+        if (!file_exists(($filename)))
+            return 0;
         $file = file_get_contents($filename);
         $t->head = unserialize($file);
         if (!is_a($t, "Tier")) {

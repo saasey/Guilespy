@@ -52,48 +52,13 @@ $dataset->head = $dataset->save->load_dataset($dataset, "save.txt");
 // and keywords
 
 $x = 0;
-foreach (scandir(dirname(__NAMESPACE__) . "/PHP/../origin/") as $file) {
-    if ($file[0] == '.') {
-        continue;
-    }
-    $branch1 = new Branches();
-    $branch1->origin = dirname(__NAMESPACE__) . "/PHP/../origin/" . $file;
-    $branch1->keywords = array($x, "dci");
-    $branch1->cat[] = "Car";
-    // create new input
-    $node = $png->find_tier($branch1);
-    // insert input ($node) into tree
-    // Find matches
-    $dataset->search_imgs($node);
-    $dataset->insert_branch($node);
-
-    $x++;
-    if ($x == 25)
-        break;
-}
+$br = new Branches();
+$br->origin = dirname(__NAMESPACE__) . "/PHP/../origin/00014.jpg";
+$br->cat[] = "Car";
+$test = new UI();
+$test->single_image_on_dataset($br,40);
 
 echo "<hr/>";
-$branch2 = new Branches();
-$branch2->origin = dirname(__NAMESPACE__) . "/php" . "/../origin/00002.JPG";
-
-$branch2 = $dataset->retrieve_branch_origin($branch2);
-$branch2->keywords = array("2", ":P pic");
-
-$dataset->relabel_img($branch2, $branch2->keywords);
-
-$dataset->search_imgs($branch2);
-
-$branch3 = new Branches();
-
-$branch3->origin = dirname(__NAMESPACE__) . "/php" . "/../origin/00024.JPG";
-
-$branch3 = $dataset->retrieve_branch_origin($branch3);
-$branch3->keywords = array("24", "hyuk, gee whiz!");
-
-$dataset->relabel_img($branch3, $branch3->keywords);
-
-$dataset->search_imgs($branch3);
-
 // Let's get both of our labels here
 // save your latest dataset(common list)
 $dataset->save->save_dataset($dataset, "save.txt");

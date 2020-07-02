@@ -9,7 +9,7 @@ namespace lids\PHP;
  * Shrinks files to just above "ambiguous" state
  *
  * @author David Pulse <inland14@live.com>
- * @api 3.1.0
+ * @api v3.1.5
  */
 class PNG
 {
@@ -77,10 +77,12 @@ class PNG
         return $input;
     }
 
-    public function img_contrast(Tier $tier, Branches $input, string $file, string $bri)
+    public function img_contrast(Tier $tier, Branches $input, string $file, string $bri = "")
     {
 
         $svf = \file_get_contents($input->image_sha1);
+        if ($bri == "")
+            $bri = \file_get_contents($file);
         $i = 0;
         $intersect = 0;
         while ($i < strlen($bri) && $i < strlen($svf)) {
@@ -95,7 +97,9 @@ class PNG
             $RETURN = 0;
             flush();
             \ob_flush();
+            return 1;
         }
+        return 0;
     }
 
     /**

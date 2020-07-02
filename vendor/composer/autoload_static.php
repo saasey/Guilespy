@@ -12,6 +12,7 @@ class ComposerStaticInit5ff4a9c89b67e935cb343c9da5afadfc
         'lids\\PHP\\PNG' => __DIR__ . '/../..' . '/lids/PHP/png.php',
         'lids\\PHP\\Save' => __DIR__ . '/../..' . '/lids/PHP/save.php',
         'lids\\PHP\\Tier' => __DIR__ . '/../..' . '/lids/PHP/tier.php',
+        'lids\\PHP\\UI' => __DIR__ . '/../..' . '/lids/PHP/ui.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

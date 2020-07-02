@@ -11,4 +11,5 @@ return array(
     'lids\\PHP\\PNG' => $baseDir . '/lids/PHP/png.php',
     'lids\\PHP\\Save' => $baseDir . '/lids/PHP/save.php',
     'lids\\PHP\\Tier' => $baseDir . '/lids/PHP/tier.php',
+    'lids\\PHP\\UI' => $baseDir . '/lids/PHP/ui.php',
 );

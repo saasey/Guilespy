@@ -5,12 +5,13 @@
             "lids/PHP/tier.php",
             "lids/PHP/png.php",
             "lids/PHP/save.php",
-            "lids/PHP/csv.php"
+            "lids/PHP/csv.php",
+            "lids/PHP/ui.php"
         ]
     },
     "name": "saasey/lidsx",
     "description": "Highly efficient, easy to use Neural Network",
-    "version": "v3.0.5",
+    "version": "v3.1.5",
     "keywords": [
         "artificial intelligence",
         "deep learning",
