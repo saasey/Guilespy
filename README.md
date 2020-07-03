@@ -3,9 +3,20 @@ lids AI API
 Package is fully functional.
 
 
+7/2/2020
+
+v3.1.5 - Okay, we're now updated, again. Something I thought
+    I wouldn't have to do. But! It was necessary. So the
+    programmer's philosophy is never over. Debug and upgrade!
+    Now I've given this a simpler way of getting a list of all
+    the images against one another. BUT! I've also gone to the
+    dark side, one I didn't intention... I added a command for
+    a comparison to ONE image!! Boy, what a heart attack! YECK!
+    Have a good day!
+
 6/30/2020
 
-vv3.1.5 - Now that I have a computer that can hack it,
+v3.1.0 - Now that I have a computer that can hack it,
     this project seems saved. I have now made sure that
     the percentages are right. If you're worried about not
     getting better percentages, it shouldn't bother you.
