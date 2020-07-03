@@ -13,6 +13,9 @@ v3.1.5 - Okay, we're now updated, again. Something I thought
     dark side, one I didn't intention... I added a command for
     a comparison to ONE image!! Boy, what a heart attack! YECK!
     Have a good day!
+    
+        UI::single_image_on_dataset(Branches,int) // The limit is the int, how many to compare
+        UI::full_dataset_breakdown(int) // The parameter is how many images to fully compare
 
 6/30/2020
 
